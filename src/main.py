@@ -3,6 +3,7 @@ import pandas as pd
 import sys
 import platform
 from datetime import datetime
+from tqdm import tqdm
 from LOGO_837477.src.logo_1 import logo
 if sys.version_info[0] == 3:
     from urllib.request import urlopen
@@ -14,7 +15,7 @@ def converter(API_url):
         response = urlopen(API_url).read()
     except:
         print("\n!!! ERROR !!!")
-        print("Please check busRouteId again.\n")
+        print("Please check API_url again.\n")
         return
     xtree = ET.fromstring(response)
 
@@ -36,6 +37,36 @@ def converter(API_url):
     print("\n### Sample is it ###")
     print(catelog_cd_df.head(10))
     print()
+
+def converter_list():
+    # API_url = "<input_URL>"
+    # busRouteId_list = "<input_busRouteId_list>"
+    for busRouteId in tqdm(busRouteId_list):
+        url = API_url + busRouteId
+        try:
+            response = urlopen(url).read()
+        except:
+            print("\n!!! ERROR !!!")
+            print("Please check API_url again.\n")
+            return
+        xtree = ET.fromstring(response)
+
+        body = xtree.find("msgBody")
+        itemList = body.findall("itemList")    
+        rows = []
+        for item in itemList:
+            location_dict = {}
+            for location in item:
+                location_dict[location.tag] = location.text
+            rows.append(location_dict)
+
+        columns = ["gpsX", "gpsY", "no", "posX", "posY"]
+        catelog_cd_df = pd.DataFrame(rows, columns = columns)
+        if platform.system() == "Windows":
+            catelog_cd_df.to_excel('.\\output\\' + busRouteId + '.xlsx')
+        else:
+            catelog_cd_df.to_excel('./output/' + busRouteId + '.xlsx')
+    return True
 
 if __name__ == "__main__":
     logo()
