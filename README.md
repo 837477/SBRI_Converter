@@ -45,6 +45,8 @@ python3 main.py
 - 본 프로그램에서는 API service Key를 검증할 수 없습니다. 따라서 요청 실패 시 Url을 다시 한 번 확인해주세요.
 
 ## Release History
+* 0.0.2
+    * List mode Update
 
 * 0.0.1
     * Converter version 0.0.1
